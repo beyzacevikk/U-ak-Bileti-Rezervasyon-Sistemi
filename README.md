@@ -1,7 +1,7 @@
 # Uçak Bileti Rezervasyon Sistemi
 Bu projede Java dilini kullanarak bir uçak bileti rezervasyon sistemi geliştirdim. Kullanıcılar uçuşları listeleyebiliyor, tek yön veya gidiş-dönüş rezervasyon yapabiliyor ve tüm rezervasyonları görüntüleyebiliyor. Ayrıca veriler CSV dosyalarına kaydedilebiliyor.
 
-## emel Özellikler
+## Temel Özellikler
 1)Uçuş listeleme
 
 Tek yön ve gidiş-dönüş rezervasyon
