@@ -1,30 +1,60 @@
-# Nesneye Yönelik Programlama dersi (Java)
-# Uçak Bileti Rezervasyon Sistemi
-Bu projede Java dilini kullanarak bir uçak bileti rezervasyon sistemi geliştirdim. Kullanıcılar uçuşları listeleyebiliyor, tek yön veya gidiş-dönüş rezervasyon yapabiliyor ve tüm rezervasyonları görüntüleyebiliyor. Ayrıca veriler CSV dosyalarına kaydedilebiliyor.
+#✈️ Uçak Bileti Rezervasyon Sistemi (Java - Nesneye Yönelik Programlama Dersi)
+Bu projede Java programlama dili kullanılarak bir uçak bileti rezervasyon sistemi geliştirdim. Kullanıcı, uçuşları listeleyebilir, tek yön veya gidiş-dönüş bilet rezervasyonu yapabilir, koltuk seçebilir ve yapılan tüm rezervasyonları görüntüleyebilir. Ayrıca tüm veriler CSV dosyalarına kaydedilmektedir.
 
-## Temel Özellikler
-1)Uçuş listeleme
+# 📌 Proje Özellikleri
+## 1. 🛫 Uçuş Listeleme
+Sistemde tanımlı tüm uçuşları kullanıcı listeleyebilir.
 
-2)Tek yön ve gidiş-dönüş rezervasyon
+Her uçuş için kalkış ve varış lokasyonu, saat, uçak modeli ve temel fiyat bilgileri gösterilir.
 
-3)Ekonomi, Business ve First Class sınıf seçimi
+## 2. 🎟️ Rezervasyon Yapma
+Kullanıcı, tek yön veya gidiş-dönüş rezervasyon seçebilir.
 
-4)Yaşa göre indirimli fiyatlandırma
+Rezervasyon sırasında:
 
-5)Koltuk numarası seçimi (boş koltuk kontrolüyle birlikte)
+Yolcunun adı ve yaşı girilir.
 
-6)Uçak, lokasyon ve rezervasyon bilgilerini CSV dosyalarına yazma
+Ekonomi, Business veya First Class uçuş sınıfı seçilir.
 
-## Kullanılan Sınıflar
-Ucak: Uçak bilgileri ve koltuk durumu tutuluyor.
+Uygun koltuklar gösterilir ve kullanıcı boş koltuklardan birini seçer.
 
-Lokasyon: Ülke, şehir ve havalimanı bilgisi içeriyor.
+Yaşa göre indirim uygulanır (örneğin çocuk veya yaşlı indirimi).
 
-Ucus: Kalkış-varış lokasyonları, saat, uçak ve baz fiyat bilgisi bulunuyor.
+Seçilen koltuk, o uçuşta rezerve edilmiş sayılır.
 
-Rezervasyon: Yolcu bilgisi, koltuk numarası, sınıf, ücret ve uçuş türü tutuluyor.
+## 3. 💺 Koltuk Seçimi ve Kontrol
+Her uçakta koltukların dolu/boş durumu takip edilir.
 
-CsvYonetici: Nesne listelerini .csv formatında dosyaya kaydediyor.
+Kullanıcı sadece boş koltuklar arasından seçim yapabilir.
 
-## Çalışma Mantığı
-Program açıldığında kullanıcıya bir menü sunuluyor. Buradan uçuşlar listelenebiliyor, rezervasyon yapılabiliyor ya da kayıtlı veriler CSV olarak dışa aktarılabiliyor. Rezervasyon yapılırken koltuklar boş/dolu durumuna göre seçilebiliyor.
+## 4. 🧾 CSV Dosyaya Yazma
+Uçak, lokasyon, uçuş ve rezervasyon bilgileri CSV dosyalarına yazılır.
+
+Bu sayede veriler daha sonra tekrar görüntülenebilir veya yedeklenebilir.
+
+# 🧱 Kullanılan Sınıflar
+Ucak: Uçak bilgilerini ve koltuk durumlarını tutar.
+
+Lokasyon: Ülke, şehir ve havalimanı bilgilerini içerir.
+
+Ucus: Kalkış-varış lokasyonları, uçuş saati, uçak ve fiyat bilgilerini barındırır.
+
+Rezervasyon: Yolcu bilgisi, koltuk numarası, sınıf, uçuş türü (tek yön/gidiş-dönüş) ve ücret bilgilerini tutar.
+
+CsvYonetici: Tüm verileri .csv formatında diske yazar.
+
+# 🧭 Kullanım Talimatları
+Program başlatıldığında kullanıcıya bir menü sunulur.
+
+Menüden:
+
+Uçuşları listeleyebilirsiniz.
+
+Yeni rezervasyon yapabilirsiniz (tek yön veya gidiş-dönüş).
+
+Tüm rezervasyonları görebilirsiniz.
+
+Verileri CSV dosyalarına kaydedebilirsiniz.
+
+Her aşamada, sistem doğru giriş yapılana kadar kullanıcıyı yönlendirir ve hatalı girişleri engeller.
+
