@@ -1,0 +1,371 @@
+import java.io.*;
+import java.util.*;
+
+class Ucak {
+    String model;
+    String marka;
+    String seriNo;
+    int kapasite;
+    Map<String, Boolean> koltuklar;
+
+    public Ucak(String model, String marka, String seriNo, int kapasite) {
+        this.model = model;
+        this.marka = marka;
+        this.seriNo = seriNo;
+        this.kapasite = kapasite;
+        this.koltuklar = new LinkedHashMap<>();
+        for (int i = 1; i <= kapasite; i++) {
+            koltuklar.put("K" + i, true);  // true = boş koltuk
+        }
+    }
+
+    public void yazdir() {
+        System.out.println("Uçak: " + marka + " " + model + " (" + seriNo + ") - Kapasite: " + kapasite);
+    }
+
+    public String toCSV() {
+        return marka + "," + model + "," + seriNo + "," + kapasite;
+    }
+}
+
+class Lokasyon {
+    String ulke;
+    String sehir;
+    String havaalani;
+    boolean aktif;
+
+    public Lokasyon(String ulke, String sehir, String havaalani, boolean aktif) {
+        this.ulke = ulke;
+        this.sehir = sehir;
+        this.havaalani = havaalani;
+        this.aktif = aktif;
+    }
+
+    public String toString() {
+        return sehir + ", " + ulke + " - " + havaalani;
+    }
+
+    public String toCSV() {
+        return ulke + "," + sehir + "," + havaalani + "," + (aktif ? "Aktif" : "Pasif");
+    }
+}
+
+class Ucus {
+    int id;
+    Lokasyon kalkis;
+    Lokasyon varis;
+    String saat;
+    Ucak ucak;
+    double bazFiyat;
+
+    public Ucus(int id, Lokasyon kalkis, Lokasyon varis, String saat, Ucak ucak, double bazFiyat) {
+        this.id = id;
+        this.kalkis = kalkis;
+        this.varis = varis;
+        this.saat = saat;
+        this.ucak = ucak;
+        this.bazFiyat = bazFiyat;
+    }
+
+    public void yazdir() {
+        System.out.println("Uçuş ID: " + id + " | " + kalkis + " -> " + varis + " | Saat: " + saat + " | Fiyat: " + bazFiyat + " TL");
+    }
+}
+
+class Rezervasyon {
+    Ucus ucus;
+    String ad;
+    String soyad;
+    int yas;
+    String cinsiyet;
+    String koltukNo;
+    String sinif;
+    double ucret;
+    boolean gidisDonus;
+    int donusUcusID;  // Gidiş-dönüş ise dönüş uçuş ID'si
+
+    public Rezervasyon(Ucus ucus, String ad, String soyad, int yas, String cinsiyet, String koltukNo, String sinif, double ucret) {
+        this.ucus = ucus;
+        this.ad = ad;
+        this.soyad = soyad;
+        this.yas = yas;
+        this.cinsiyet = cinsiyet;
+        this.koltukNo = koltukNo;
+        this.sinif = sinif;
+        this.ucret = ucret;
+        this.gidisDonus = false;
+    }
+
+    public Rezervasyon(Ucus gidisUcus, Ucus donusUcus, String ad, String soyad, int yas, String cinsiyet, String gidisKoltuk, String donusKoltuk, String sinif, double ucret) {
+        this.ucus = gidisUcus;
+        this.ad = ad;
+        this.soyad = soyad;
+        this.yas = yas;
+        this.cinsiyet = cinsiyet;
+        this.koltukNo = gidisKoltuk + "/" + donusKoltuk;
+        this.sinif = sinif;
+        this.ucret = ucret;
+        this.gidisDonus = true;
+        this.donusUcusID = donusUcus.id;
+    }
+
+    public String toCSV() {
+        if (gidisDonus) {
+            return ucus.id + "," + donusUcusID + "," + ad + "," + soyad + "," + yas + "," + cinsiyet + "," + koltukNo + "," + sinif + "," + ucret + "," + "Gidiş-Dönüş";
+        }
+        return ucus.id + ",," + ad + "," + soyad + "," + yas + "," + cinsiyet + "," + koltukNo + "," + sinif + "," + ucret + "," + "Tek Yön";
+    }
+
+    public String toString() {
+        if (gidisDonus) {
+            return ad + " " + soyad + " | Gidiş Uçuş ID: " + ucus.id + ", Dönüş Uçuş ID: " + donusUcusID +
+                    " | Koltuklar: " + koltukNo + " | Sınıf: " + sinif + " | Ücret: " + ucret + " TL";
+        }
+        return ad + " " + soyad + " | Uçuş ID: " + ucus.id + " | Koltuk: " + koltukNo + " | Sınıf: " + sinif + " | Ücret: " + ucret + " TL";
+    }
+}
+
+class CsvYonetici<T> {
+    // Dosyaya ekleme modunda yazma opsiyonu
+    public void yaz(List<T> liste, String dosyaAdi, boolean append) throws IOException {
+        BufferedWriter writer = new BufferedWriter(new FileWriter(dosyaAdi, append));
+        for (T item : liste) {
+            try {
+                writer.write((String) item.getClass().getMethod("toCSV").invoke(item));
+                writer.newLine();
+            } catch (Exception e) {
+                System.out.println("CSV yazma hatası: " + e.getMessage());
+            }
+        }
+        writer.close();
+    }
+
+    public void yaz(List<T> liste, String dosyaAdi) throws IOException {
+        yaz(liste, dosyaAdi, false);
+    }
+}
+
+public class UcakBiletiRezervasyonUygulamasi {
+    static List<Ucak> ucaklar = new ArrayList<>();
+    static List<Lokasyon> lokasyonlar = new ArrayList<>();
+    static List<Ucus> ucuslar = new ArrayList<>();
+    static List<Rezervasyon> rezervasyonlar = new ArrayList<>();
+
+    public static void main(String[] args) throws IOException {
+        Scanner sc = new Scanner(System.in);
+        verileriHazirla();
+
+        while (true) {
+            System.out.println("\n--- Uçak Bileti Rezervasyon Sistemi ---");
+            System.out.println("1. Uçuşları Listele");
+            System.out.println("2. Rezervasyon Yap");
+            System.out.println("3. Rezervasyonları Listele");
+            System.out.println("4. Uçakları Kaydet (CSV)");
+            System.out.println("5. Lokasyonları Kaydet (CSV)");
+            System.out.println("6. Rezervasyonları Kaydet (CSV)");
+            System.out.println("7. Çıkış");
+            System.out.print("Seçiminiz: ");
+
+            int secim = -1;
+            try {
+                secim = Integer.parseInt(sc.nextLine());
+            } catch (NumberFormatException e) {
+                System.out.println("Geçersiz giriş. Lütfen sayı giriniz.");
+                continue;
+            }
+
+            switch (secim) {
+                case 1:
+                    ucuslariListele();
+                    break;
+                case 2:
+                    rezervasyonYap(sc);
+                    break;
+                case 3:
+                    rezervasyonlariListele();
+                    break;
+                case 4:
+                    System.out.println("--- Kayıt Edilecek Uçaklar ---");
+                    for (Ucak u : ucaklar) u.yazdir();
+                    new CsvYonetici<Ucak>().yaz(ucaklar, "ucaklar.csv");
+                    System.out.println("Uçaklar 'ucaklar.csv' dosyasına kaydedildi.");
+                    break;
+                case 5:
+                    System.out.println("--- Kayıt Edilecek Lokasyonlar ---");
+                    for (Lokasyon l : lokasyonlar) System.out.println(l);
+                    new CsvYonetici<Lokasyon>().yaz(lokasyonlar, "lokasyonlar.csv");
+                    System.out.println("Lokasyonlar 'lokasyonlar.csv' dosyasına kaydedildi.");
+                    break;
+                case 6:
+                    new CsvYonetici<Rezervasyon>().yaz(rezervasyonlar, "rezervasyonlar.csv");
+                    System.out.println("Rezervasyonlar 'rezervasyonlar.csv' dosyasına kaydedildi.");
+                    break;
+                case 7:
+                    System.out.println("Program sonlandırılıyor...");
+                    return;
+                default:
+                    System.out.println("Geçersiz seçim!");
+            }
+        }
+    }
+
+    private static void ucuslariListele() {
+        System.out.println("--- Uçuşlar ---");
+        for (Ucus u : ucuslar) u.yazdir();
+    }
+
+    private static void rezervasyonlariListele() {
+        if (rezervasyonlar.isEmpty()) {
+            System.out.println("Henüz rezervasyon yapılmadı.");
+            return;
+        }
+        System.out.println("--- Mevcut Rezervasyonlar ---");
+        for (Rezervasyon r : rezervasyonlar) {
+            System.out.println(r);
+        }
+    }
+
+    private static void rezervasyonYap(Scanner sc) throws IOException {
+        System.out.println("--- Uçuşlar ---");
+        ucuslariListele();
+
+        System.out.print("Uçuş ID seçin: ");
+        int id = Integer.parseInt(sc.nextLine());
+        Ucus gidisUcus = ucuslar.stream().filter(u -> u.id == id).findFirst().orElse(null);
+
+        if (gidisUcus == null) {
+            System.out.println("Geçersiz Uçuş ID!");
+            return;
+        }
+
+        System.out.print("Gidiş-dönüş mü almak istiyorsunuz? (E/H): ");
+        String gd = sc.nextLine().trim().toUpperCase();
+        boolean gidisDonus = gd.equals("E");
+
+        Ucus donusUcus = null;
+        if (gidisDonus) {
+            System.out.println("--- Dönüş Uçuşlarını Seçin ---");
+            // Dönüş uçuşları: varış -> kalkış olanlar
+            ucuslar.stream()
+                    .filter(u -> u.kalkis.equals(gidisUcus.varis) && u.varis.equals(gidisUcus.kalkis))
+                    .forEach(Ucus::yazdir);
+
+            System.out.print("Dönüş uçuşu ID'si seçin: ");
+            int donusId = Integer.parseInt(sc.nextLine());
+            donusUcus = ucuslar.stream().filter(u -> u.id == donusId).findFirst().orElse(null);
+            if (donusUcus == null) {
+                System.out.println("Geçersiz dönüş uçuşu ID!");
+                return;
+            }
+        }
+
+        System.out.print("Kaç bilet alacaksınız? ");
+        int adet = Integer.parseInt(sc.nextLine());
+
+        for (int i = 0; i < adet; i++) {
+            System.out.println("\nYolcu " + (i + 1));
+
+            System.out.print("Ad: ");
+            String ad = sc.nextLine();
+
+            System.out.print("Soyad: ");
+            String soyad = sc.nextLine();
+
+            System.out.print("Yaş: ");
+            int yas = Integer.parseInt(sc.nextLine());
+
+            System.out.print("Cinsiyet (E/K): ");
+            String cinsiyet = sc.nextLine();
+
+            System.out.println("Sınıf Seçin: 1. Ekonomi 2. Business 3. First Class");
+            int s = Integer.parseInt(sc.nextLine());
+
+            String sinif = switch (s) {
+                case 1 -> "Ekonomi";
+                case 2 -> "Business";
+                case 3 -> "First";
+                default -> "Ekonomi";
+            };
+
+            double carpim = switch (s) {
+                case 1 -> 1.0;
+                case 2 -> 1.5;
+                case 3 -> 2.0;
+                default -> 1.0;
+            };
+
+            // Gidiş koltuğu seçimi
+            System.out.println("Gidiş Uçuşu Boş Koltuklar:");
+            for (var entry : gidisUcus.ucak.koltuklar.entrySet()) {
+                if (entry.getValue()) System.out.print(entry.getKey() + " ");
+            }
+            System.out.print("\nKoltuk seçin (gidiş): ");
+            String gidisKoltuk = sc.nextLine();
+
+            if (!gidisUcus.ucak.koltuklar.containsKey(gidisKoltuk) || !gidisUcus.ucak.koltuklar.get(gidisKoltuk)) {
+                System.out.println("Gidiş koltuğu dolu veya geçersiz!");
+                i--;
+                continue;
+            }
+
+            String donusKoltuk = "";
+            if (gidisDonus) {
+                System.out.println("Dönüş Uçuşu Boş Koltuklar:");
+                for (var entry : donusUcus.ucak.koltuklar.entrySet()) {
+                    if (entry.getValue()) System.out.print(entry.getKey() + " ");
+                }
+                System.out.print("\nKoltuk seçin (dönüş): ");
+                donusKoltuk = sc.nextLine();
+
+                if (!donusUcus.ucak.koltuklar.containsKey(donusKoltuk) || !donusUcus.ucak.koltuklar.get(donusKoltuk)) {
+                    System.out.println("Dönüş koltuğu dolu veya geçersiz!");
+                    i--;
+                    continue;
+                }
+            }
+
+            // Ücret hesaplama
+            double fiyatGidis = gidisUcus.bazFiyat * carpim;
+            if (yas >= 2 && yas < 12) fiyatGidis *= 0.5;
+
+            double toplamFiyat = fiyatGidis;
+
+            if (gidisDonus) {
+                double fiyatDonus = donusUcus.bazFiyat * carpim;
+                if (yas >= 2 && yas < 12) fiyatDonus *= 0.5;
+                toplamFiyat += fiyatDonus;
+            }
+
+            // Koltukları rezerve et
+            gidisUcus.ucak.koltuklar.put(gidisKoltuk, false);
+            if (gidisDonus) donusUcus.ucak.koltuklar.put(donusKoltuk, false);
+
+            Rezervasyon r;
+            if (gidisDonus) {
+                r = new Rezervasyon(gidisUcus, donusUcus, ad, soyad, yas, cinsiyet, gidisKoltuk, donusKoltuk, sinif, toplamFiyat);
+            } else {
+                r = new Rezervasyon(gidisUcus, ad, soyad, yas, cinsiyet, gidisKoltuk, sinif, toplamFiyat);
+            }
+
+            rezervasyonlar.add(r);
+            System.out.println("Rezervasyon başarıyla oluşturuldu. Ücret: " + toplamFiyat + " TL");
+        }
+    }
+
+    public static void verileriHazirla() {
+        Ucak u1 = new Ucak("A320", "Airbus", "UC01", 30);
+        Ucak u2 = new Ucak("737", "Boeing", "UC02", 30);
+        ucaklar.add(u1);
+        ucaklar.add(u2);
+
+        Lokasyon l1 = new Lokasyon("Türkiye", "İstanbul", "IST", true);
+        Lokasyon l2 = new Lokasyon("Almanya", "Berlin", "BER", true);
+        Lokasyon l3 = new Lokasyon("Fransa", "Paris", "CDG", true);
+        lokasyonlar.addAll(Arrays.asList(l1, l2, l3));
+
+        ucuslar.add(new Ucus(1, l1, l2, "08:30", u1, 1500));
+        ucuslar.add(new Ucus(2, l2, l1, "14:00", u1, 1500));
+        ucuslar.add(new Ucus(3, l1, l3, "09:00", u2, 2000));
+        ucuslar.add(new Ucus(4, l3, l1, "18:00", u2, 2000));
+    }
+}
