@@ -1,7 +1,7 @@
 # Uçak Bileti Rezervasyon Sistemi
 Bu projede Java dilini kullanarak bir uçak bileti rezervasyon sistemi geliştirdim. Kullanıcılar uçuşları listeleyebiliyor, tek yön veya gidiş-dönüş rezervasyon yapabiliyor ve tüm rezervasyonları görüntüleyebiliyor. Ayrıca veriler CSV dosyalarına kaydedilebiliyor.
 
-##Temel Özellikler
+## emel Özellikler
 1)Uçuş listeleme
 
 Tek yön ve gidiş-dönüş rezervasyon
@@ -14,7 +14,7 @@ Tek yön ve gidiş-dönüş rezervasyon
 
 6)Uçak, lokasyon ve rezervasyon bilgilerini CSV dosyalarına yazma
 
-##Kullanılan Sınıflar
+## Kullanılan Sınıflar
 Ucak: Uçak bilgileri ve koltuk durumu tutuluyor.
 
 Lokasyon: Ülke, şehir ve havalimanı bilgisi içeriyor.
@@ -25,5 +25,5 @@ Rezervasyon: Yolcu bilgisi, koltuk numarası, sınıf, ücret ve uçuş türü t
 
 CsvYonetici: Nesne listelerini .csv formatında dosyaya kaydediyor.
 
-##Çalışma Mantığı
+## Çalışma Mantığı
 Program açıldığında kullanıcıya bir menü sunuluyor. Buradan uçuşlar listelenebiliyor, rezervasyon yapılabiliyor ya da kayıtlı veriler CSV olarak dışa aktarılabiliyor. Rezervasyon yapılırken koltuklar boş/dolu durumuna göre seçilebiliyor.
