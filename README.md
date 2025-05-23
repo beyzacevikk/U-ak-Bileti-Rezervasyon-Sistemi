@@ -4,11 +4,11 @@ Bu projede Java dilini kullanarak bir uçak bileti rezervasyon sistemi geliştir
 ## Temel Özellikler
 1)Uçuş listeleme
 
-Tek yön ve gidiş-dönüş rezervasyon
+2)Tek yön ve gidiş-dönüş rezervasyon
 
 3)Ekonomi, Business ve First Class sınıf seçimi
 
-4) Yaşa göre indirimli fiyatlandırma
+4)Yaşa göre indirimli fiyatlandırma
 
 5)Koltuk numarası seçimi (boş koltuk kontrolüyle birlikte)
 
